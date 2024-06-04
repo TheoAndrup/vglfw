@@ -12,6 +12,7 @@ $if linux {
 	#include "gammaramp.h"
 	#include "image.h"
 	#include "vidmode.h"
+	#include "helper.h"
 }
 
 $if windows {

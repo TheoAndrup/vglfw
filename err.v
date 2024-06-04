@@ -19,7 +19,7 @@ fn create_error(code int, msg string) Err {
 // Should be call after each GLFW method that can produce an error.
 pub fn check_error() ! {
 	mut m := &char(0)
-	code := C.glfwGetError(&m)
+	code := C.glfwGetError(v_to_cv(&m))
 	if code == glfw_no_error {
 		return
 	}

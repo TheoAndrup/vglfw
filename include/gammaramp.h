@@ -7,7 +7,7 @@ void glfwGetGammaRampSizeHelper(GLFWgammaramp *gr, unsigned int *size)
     *size = (*gr).size;
 }
 
-void glfwGetGammaRampRGBBitsHelper(GLFWgammaramp *gr, unsigned short **r, unsigned short **g, unsigned short **b)
+void glfwGetGammaRampRGBBitsHelper(GLFWgammaramp *gr, void **r, void **g, void **b)
 {
     unsigned int size = 0;
     glfwGetGammaRampSizeHelper(gr, &size);
@@ -24,7 +24,7 @@ void glfwGetGammaRampRGBBitHelper(GLFWgammaramp *gr, int index, unsigned short *
     *b = (*gr).blue[index];
 }
 
-void glfwCreateGammaRampHelper(GLFWgammaramp *gr, unsigned int size, unsigned short *r, unsigned short *g, unsigned short *b)
+void glfwCreateGammaRampHelper(GLFWgammaramp *gr, unsigned int size, void *r, void *g, void *b)
 {
     gr->size = size;
     gr->red = r;

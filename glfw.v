@@ -3,6 +3,8 @@ module vglfw
 import semver
 
 // Forward declaration
+fn C.VtoCVfw(v voidptr) voidptr
+
 fn C.glfwInit() int
 
 fn C.glfwTerminate()
@@ -17,7 +19,7 @@ fn C.glfwGetError(description &&char) int
 
 fn C.glfwSetErrorCallback(callback FnError) FnError
 
-fn C.glfwGetMonitors(count &int) &voidptr
+fn C.glfwGetMonitors(count &int) voidptr
 
 fn C.glfwGetPrimaryMonitor() &C.GLFWmonitor
 
@@ -65,6 +67,12 @@ fn C.glfwSetJoystickCallback(callback FnJoystick) FnJoystick
 
 fn C.glfwUpdateGamepadMappings(mappings &char) int
 
+
+//workaround pointer conversion
+pub fn v_to_cv(v voidptr) voidptr {
+	return C.VtoCVfw(v)
+}
+
 // initialize GLFW
 pub fn initialize() !bool {
 	ok := C.glfwInit()
@@ -104,7 +112,7 @@ pub fn get_semantic_version() semver.Version {
 
 // get_version_string gets the current GLFW version as string
 pub fn get_version_string() string {
-	s := C.glfwGetVersionString()
+	mut s := voidptr(C.glfwGetVersionString())
 	return unsafe { cstring_to_vstring(s) }
 }
 
@@ -113,16 +121,23 @@ pub fn set_error_callback(cb FnError) FnError {
 	return C.glfwSetErrorCallback(cb)
 }
 
+type Marray = []&Monitor
+fn C.memcopy_workaround(a voidptr, b voidptr, count int)
+
 // get_monitors retrieves all available monitors
 pub fn get_monitors() ![]&Monitor {
 	count := 0
-	c_monitors := C.glfwGetMonitors(&count)
+	vp := C.glfwGetMonitors(&count)
+	c_monitors := Marray{}
+	C.memcopy_workaround(vp, voidptr(&c_monitors), count)
+	//maybe this might work; but probably not :)
+
 	check_error()!
 	//
 	unsafe {
 		mut v_monitors := []&Monitor{len: count}
 		for idx := 0; idx < count; idx++ {
-			v_monitors[idx].data = c_monitors[idx]
+			v_monitors[idx].data = &C.GLFWmonitor(&c_monitors[idx])
 		}
 		return v_monitors
 	}
